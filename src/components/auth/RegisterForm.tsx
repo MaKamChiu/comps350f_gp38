@@ -2,18 +2,20 @@ import React, { useState } from 'react';
 import { UserPlus } from 'lucide-react';
 
 interface RegisterFormProps {
-  onRegister: (username: string, name: string, password: string) => void;
+  onRegister: (username: string, name: string, password: string, email: string) => void;
   onToggleForm: () => void;
 }
 
 export default function RegisterForm({ onRegister, onToggleForm }: RegisterFormProps) {
   const [username, setUsername] = useState('');
   const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onRegister(username, name, password);
+    onRegister(username, name, password, email);
+    onToggleForm(); // Redirect to login after registration
   };
 
   return (
@@ -46,6 +48,18 @@ export default function RegisterForm({ onRegister, onToggleForm }: RegisterFormP
               placeholder="Full Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+          <div>
+            <label htmlFor="email" className="sr-only">Email</label>
+            <input
+              id="email"
+              type="email"
+              required
+              className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
           <div>

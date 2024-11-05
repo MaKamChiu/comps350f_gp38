@@ -11,6 +11,8 @@ export interface User {
   id: string;
   username: string;
   name: string;
+  email: string;
+  password?: string;
   isAdmin: boolean;
   hasVoted: boolean;
   registeredAt: string;
