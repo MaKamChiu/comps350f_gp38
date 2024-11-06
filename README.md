@@ -1,4 +1,4 @@
-# comps350f_gp38
+# COMPS350F_GROUP38 ONLINE VOTING SYSTEM
 
 
 ## Verification
