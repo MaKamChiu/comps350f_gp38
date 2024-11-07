@@ -1,4 +1,4 @@
-# SecureVote - Online Voting System
+# COMPS350F Group 38 - Online Voting System
 
 A modern, secure, and flexible online voting system built with React and TypeScript.
 
