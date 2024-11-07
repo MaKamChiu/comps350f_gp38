@@ -7,6 +7,14 @@ export interface Candidate {
   description: string;
 }
 
+export interface VotingOption {
+  id: string;
+  name: string;
+  description: string;
+  maxSelections: number;
+  candidates: Candidate[];
+}
+
 export interface User {
   id: string;
   username: string;
@@ -14,19 +22,14 @@ export interface User {
   email: string;
   password?: string;
   isAdmin: boolean;
-  hasVoted: boolean;
+  votedOptions: Set<string>;
   registeredAt: string;
-}
-
-export interface VotingState {
-  isAuthenticated: boolean;
-  currentUser: User | null;
-  candidates: Candidate[];
-  votingEnded: boolean;
+  language?: string;
 }
 
 export interface BallotRecord {
   userId: string;
+  optionId: string;
   candidateId: string;
   timestamp: string;
   verified: boolean;

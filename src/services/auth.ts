@@ -17,7 +17,7 @@ export const AuthService = {
       email,
       password,
       isAdmin: username.includes('admin'),
-      hasVoted: false,
+      votedOptions: new Set(),
       registeredAt: new Date().toISOString(),
     };
 
@@ -30,7 +30,10 @@ export const AuthService = {
     if (!user || user.password !== password) {
       return null;
     }
-    return user;
+    return {
+      ...user,
+      votedOptions: user.votedOptions || new Set()
+    };
   },
 
   resetPassword: async (username: string, email: string): Promise<boolean> => {
@@ -48,9 +51,9 @@ export const AuthService = {
   },
 
   resetAllVotes: (): void => {
-    // Reset hasVoted status for all users
+    // Reset votedOptions for all users
     users.forEach(user => {
-      user.hasVoted = false;
+      user.votedOptions = new Set();
       users.set(user.username, user);
     });
   },
