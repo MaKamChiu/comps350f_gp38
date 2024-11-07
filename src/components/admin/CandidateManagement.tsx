@@ -1,20 +1,14 @@
 import React, { useState } from 'react';
-import { Edit2, Plus, X, Save, Trash2 } from 'lucide-react';
-import type { Candidate } from '../../types';
+import { Edit2, Plus, Trash2, Save } from 'lucide-react';
+import type { Candidate, VotingOption } from '../../types';
+import { useVotingRules } from '../../contexts/VotingRulesContext';
 
 interface CandidateManagementProps {
-  candidates: Candidate[];
-  onUpdateCandidate: (candidate: Candidate) => void;
-  onAddCandidate: (candidate: Candidate) => void;
-  onDeleteCandidate: (candidateId: string) => void;
+  selectedOption: VotingOption;
 }
 
-export default function CandidateManagement({
-  candidates,
-  onUpdateCandidate,
-  onAddCandidate,
-  onDeleteCandidate,
-}: CandidateManagementProps) {
+export default function CandidateManagement({ selectedOption }: CandidateManagementProps) {
+  const { updateVotingOption } = useVotingRules();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editForm, setEditForm] = useState<Partial<Candidate>>({});
@@ -26,11 +20,17 @@ export default function CandidateManagement({
 
   const handleSave = () => {
     if (editingId && editForm.name && editForm.position && editForm.description && editForm.imageUrl) {
-      onUpdateCandidate({
-        ...editForm,
-        id: editingId,
-        votes: candidates.find(c => c.id === editingId)?.votes || 0
-      } as Candidate);
+      const updatedCandidates = selectedOption.candidates.map(candidate =>
+        candidate.id === editingId
+          ? { ...editForm, id: editingId, votes: candidate.votes } as Candidate
+          : candidate
+      );
+
+      updateVotingOption({
+        ...selectedOption,
+        candidates: updatedCandidates
+      });
+
       setEditingId(null);
       setEditForm({});
     }
@@ -38,14 +38,27 @@ export default function CandidateManagement({
 
   const handleAdd = () => {
     if (editForm.name && editForm.position && editForm.description && editForm.imageUrl) {
-      onAddCandidate({
+      const newCandidate: Candidate = {
         ...editForm,
         id: crypto.randomUUID(),
         votes: 0
-      } as Candidate);
+      } as Candidate;
+
+      updateVotingOption({
+        ...selectedOption,
+        candidates: [...selectedOption.candidates, newCandidate]
+      });
+
       setShowAddForm(false);
       setEditForm({});
     }
+  };
+
+  const handleDelete = (candidateId: string) => {
+    updateVotingOption({
+      ...selectedOption,
+      candidates: selectedOption.candidates.filter(c => c.id !== candidateId)
+    });
   };
 
   const renderForm = (isEditing: boolean) => (
@@ -111,7 +124,9 @@ export default function CandidateManagement({
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-        <h3 className="text-lg font-medium text-gray-900">Manage Candidates</h3>
+        <h3 className="text-lg font-medium text-gray-900">
+          Manage Candidates for {selectedOption.name}
+        </h3>
         {!showAddForm && (
           <button
             onClick={() => setShowAddForm(true)}
@@ -126,7 +141,7 @@ export default function CandidateManagement({
         {showAddForm && renderForm(false)}
         
         <div className="space-y-4">
-          {candidates.map((candidate) => (
+          {selectedOption.candidates.map((candidate) => (
             <div key={candidate.id} className="border rounded-lg p-4">
               {editingId === candidate.id ? (
                 renderForm(true)
@@ -146,7 +161,7 @@ export default function CandidateManagement({
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => onDeleteCandidate(candidate.id)}
+                      onClick={() => handleDelete(candidate.id)}
                       className="p-2 text-gray-400 hover:text-red-600"
                     >
                       <Trash2 className="w-4 h-4" />

@@ -7,52 +7,22 @@ import VotingSection from './components/VotingSection';
 import AdminDashboard from './components/AdminDashboard';
 import { useAuth } from './hooks/useAuth';
 import { AuthService } from './services/auth';
-import type { Candidate, BallotRecord } from './types';
-
-const initialCandidates: Candidate[] = [
-  {
-    id: '1',
-    name: 'Sarah Johnson',
-    position: 'Technical Lead',
-    votes: 15,
-    imageUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=400&h=300',
-    description: 'Expert in system architecture and team leadership with 8+ years of experience.',
-  },
-  {
-    id: '2',
-    name: 'Michael Chen',
-    position: 'Software Architect',
-    votes: 12,
-    imageUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=400&h=300',
-    description: 'Specialized in scalable cloud solutions and microservices architecture.',
-  },
-  {
-    id: '3',
-    name: 'Emily Rodriguez',
-    position: 'Development Manager',
-    votes: 18,
-    imageUrl: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=400&h=300',
-    description: 'Proven track record in delivering complex software projects on time.',
-  },
-];
-
-const initialBallots: BallotRecord[] = [];
+import { useVotingRules } from './contexts/VotingRulesContext';
+import type { Candidate, BallotRecord, VotingOption } from './types';
 
 export function App() {
   const { user, error, login, register, resetPassword, logout, updateUser } = useAuth();
+  const { votingOptions, updateVotingOption } = useVotingRules();
   const [showLogin, setShowLogin] = useState(true);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const [state, setState] = useState({
-    candidates: initialCandidates,
-    votingEnded: false,
-  });
-  const [ballots, setBallots] = useState<BallotRecord[]>(initialBallots);
+  const [ballots, setBallots] = useState<BallotRecord[]>([]);
 
-  const handleVote = (candidateId: string) => {
-    if (!user || user.hasVoted || state.votingEnded) return;
+  const handleVote = (optionId: string, candidateId: string) => {
+    if (!user || (user.votedOptions && user.votedOptions.has(optionId))) return;
 
     const ballot: BallotRecord = {
       userId: user.id,
+      optionId,
       candidateId,
       timestamp: new Date().toISOString(),
       verified: false,
@@ -60,73 +30,55 @@ export function App() {
 
     setBallots([...ballots, ballot]);
 
-    setState({
-      ...state,
-      candidates: state.candidates.map((candidate) =>
+    // Update candidate votes in the voting option
+    const option = votingOptions.find(opt => opt.id === optionId);
+    if (option) {
+      const updatedCandidates = option.candidates.map(candidate =>
         candidate.id === candidateId
           ? { ...candidate, votes: candidate.votes + 1 }
           : candidate
-      ),
-    });
+      );
 
+      updateVotingOption({
+        ...option,
+        candidates: updatedCandidates
+      });
+    }
+
+    // Update user's voted options
+    const updatedVotedOptions = new Set(user.votedOptions || new Set());
+    updatedVotedOptions.add(optionId);
     updateUser({
       ...user,
-      hasVoted: true,
-    });
-  };
-
-  const handleEndVoting = () => {
-    setState({
-      ...state,
-      votingEnded: true,
+      votedOptions: updatedVotedOptions
     });
   };
 
   const handleRestartVoting = () => {
-    // Reset all votes and voting status
-    setState({
-      ...state,
-      votingEnded: false,
-      candidates: state.candidates.map(candidate => ({
-        ...candidate,
-        votes: 0
-      })),
+    // Reset all votes for all options
+    votingOptions.forEach(option => {
+      updateVotingOption({
+        ...option,
+        candidates: option.candidates.map(candidate => ({
+          ...candidate,
+          votes: 0
+        }))
+      });
     });
+    
+    // Clear all ballots
     setBallots([]);
     
-    // Reset hasVoted status for all users
+    // Reset all users' voting status
     AuthService.resetAllVotes();
     
-    // Update current user's hasVoted status
+    // Update current user's voting status
     if (user) {
       updateUser({
         ...user,
-        hasVoted: false,
+        votedOptions: new Set()
       });
     }
-  };
-
-  const handleUpdateCandidate = (updatedCandidate: Candidate) => {
-    setState({
-      ...state,
-      candidates: state.candidates.map(candidate =>
-        candidate.id === updatedCandidate.id ? updatedCandidate : candidate
-      ),
-    });
-  };
-
-  const handleAddCandidate = (newCandidate: Candidate) => {
-    setState({
-      ...state,
-      candidates: [...state.candidates, newCandidate],
-    });
-  };
-
-  const handleDeleteCandidate = (candidateId: string) => {
-    setState({
-      ...state,
-      candidates: state.candidates.filter(candidate => candidate.id !== candidateId),
-    });
   };
 
   if (!user) {
@@ -167,29 +119,20 @@ export function App() {
     );
   }
 
-  const totalVotes = state.candidates.reduce((sum, candidate) => sum + candidate.votes, 0);
-
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar user={user} onLogout={logout} />
       {user.isAdmin ? (
         <AdminDashboard
-          candidates={state.candidates}
-          totalVotes={totalVotes}
-          onEndVoting={handleEndVoting}
+          votingOptions={votingOptions}
           onRestartVoting={handleRestartVoting}
-          onUpdateCandidate={handleUpdateCandidate}
-          onAddCandidate={handleAddCandidate}
-          onDeleteCandidate={handleDeleteCandidate}
           ballots={ballots}
-          votingEnded={state.votingEnded}
         />
       ) : (
         <VotingSection
-          candidates={state.candidates}
+          votingOptions={votingOptions}
           onVote={handleVote}
-          hasVoted={user.hasVoted}
-          votingEnded={state.votingEnded}
+          votedOptions={user.votedOptions || new Set()}
         />
       )}
     </div>

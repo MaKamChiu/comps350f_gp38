@@ -1,15 +1,17 @@
 import React from 'react';
 import { BarChart, PieChart, Download } from 'lucide-react';
-import type { Candidate } from '../../types';
+import type { VotingOption } from '../../types';
 
 interface VotingReportProps {
-  candidates: Candidate[];
+  votingOptions: VotingOption[];
   totalVotes: number;
 }
 
-export default function VotingReport({ candidates, totalVotes }: VotingReportProps) {
+export default function VotingReport({ votingOptions, totalVotes }: VotingReportProps) {
+  const allCandidates = votingOptions.flatMap(option => option.candidates);
+
   const downloadReport = () => {
-    const report = candidates.map(c => ({
+    const report = allCandidates.map(c => ({
       name: c.name,
       position: c.position,
       votes: c.votes,
@@ -50,7 +52,7 @@ export default function VotingReport({ candidates, totalVotes }: VotingReportPro
               <h4 className="font-medium text-gray-900">Vote Distribution</h4>
             </div>
             <div className="space-y-4">
-              {candidates.map((candidate) => (
+              {allCandidates.map((candidate) => (
                 <div key={candidate.id}>
                   <div className="flex justify-between text-sm text-gray-600 mb-1">
                     <span>{candidate.name}</span>
@@ -78,20 +80,24 @@ export default function VotingReport({ candidates, totalVotes }: VotingReportPro
                 <p className="text-sm text-gray-600">Total Votes Cast</p>
                 <p className="text-2xl font-bold text-indigo-600">{totalVotes}</p>
               </div>
-              <div className="bg-white p-4 rounded-md">
-                <p className="text-sm text-gray-600">Leading Candidate</p>
-                <p className="text-xl font-semibold text-gray-900">
-                  {candidates.reduce((prev, current) => 
-                    prev.votes > current.votes ? prev : current
-                  ).name}
-                </p>
-              </div>
-              <div className="bg-white p-4 rounded-md">
-                <p className="text-sm text-gray-600">Average Votes per Candidate</p>
-                <p className="text-xl font-semibold text-gray-900">
-                  {(totalVotes / candidates.length).toFixed(1)}
-                </p>
-              </div>
+              {allCandidates.length > 0 && (
+                <div className="bg-white p-4 rounded-md">
+                  <p className="text-sm text-gray-600">Leading Candidate</p>
+                  <p className="text-xl font-semibold text-gray-900">
+                    {allCandidates.reduce((prev, current) => 
+                      prev.votes > current.votes ? prev : current
+                    ).name}
+                  </p>
+                </div>
+              )}
+              {allCandidates.length > 0 && (
+                <div className="bg-white p-4 rounded-md">
+                  <p className="text-sm text-gray-600">Average Votes per Candidate</p>
+                  <p className="text-xl font-semibold text-gray-900">
+                    {(totalVotes / allCandidates.length).toFixed(1)}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>
