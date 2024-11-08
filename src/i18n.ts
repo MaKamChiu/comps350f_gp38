@@ -169,9 +169,9 @@ const resources = {
         Password: '密码',
         ForgotPw: '忘记你的密码?',
         NeedRegister: '你沒有帐号嗎？注册吧',
-        alreadyHaveAccount: '已经有帐号了？登入吧',
+        alreadyHaveAccount: '已经有帐号了？登录吧',
         Signintovote: '登录投票',
-        RegistertoVote: '注册投票',
+        RegistertoVote: '開始投票旅程',
         Signin: '登录',
       },
       admin: {

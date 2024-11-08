@@ -13,9 +13,9 @@ export default function LoginForm({ onLogin, onToggleForm, onForgotPassword }: L
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onLogin(username, password);
+    await onLogin(username.toLowerCase(), password); // Convert to lowercase for consistency
   };
 
   return (
