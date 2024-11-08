@@ -1,3 +1,4 @@
+// src/App.tsx
 import { useState } from 'react';
 import Navbar from './components/Navbar';
 import LoginForm from './components/auth/LoginForm';
@@ -8,7 +9,7 @@ import AdminDashboard from './components/AdminDashboard';
 import { useAuth } from './hooks/useAuth';
 import { AuthService } from './services/auth';
 import { useVotingRules } from './contexts/VotingRulesContext';
-import type { Candidate, BallotRecord, VotingOption } from './types';
+import type { Candidate, BallotRecord } from './types';
 
 export function App() {
   const { user, error, login, register, resetPassword, logout, updateUser } = useAuth();
@@ -27,10 +28,8 @@ export function App() {
       timestamp: new Date().toISOString(),
       verified: false,
     };
-
     setBallots([...ballots, ballot]);
 
-    // Update candidate votes in the voting option
     const option = votingOptions.find(opt => opt.id === optionId);
     if (option) {
       const updatedCandidates = option.candidates.map(candidate =>
@@ -38,14 +37,12 @@ export function App() {
           ? { ...candidate, votes: candidate.votes + 1 }
           : candidate
       );
-
       updateVotingOption({
         ...option,
         candidates: updatedCandidates
       });
     }
 
-    // Update user's voted options
     const updatedVotedOptions = new Set(user.votedOptions || new Set());
     updatedVotedOptions.add(optionId);
     updateUser({
@@ -55,7 +52,6 @@ export function App() {
   };
 
   const handleRestartVoting = () => {
-    // Reset all votes for all options
     votingOptions.forEach(option => {
       updateVotingOption({
         ...option,
@@ -66,13 +62,9 @@ export function App() {
       });
     });
     
-    // Clear all ballots
     setBallots([]);
-    
-    // Reset all users' voting status
     AuthService.resetAllVotes();
     
-    // Update current user's voting status
     if (user) {
       updateUser({
         ...user,

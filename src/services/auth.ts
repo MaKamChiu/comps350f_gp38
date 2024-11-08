@@ -1,60 +1,66 @@
+// src/services/auth.ts
+import { 
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  User as FirebaseUser 
+} from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
+import { auth, db } from '../config/firebase';
 import type { User } from '../types';
 
-// In-memory storage for demo purposes
-// In a real app, this would be a database
-const users: Map<string, User> = new Map();
+export class AuthService {
+  static async login(emailOrUsername: string, password: string): Promise<User | null> {
+    try {
+      // Check if the username is 'admin'
+      if (emailOrUsername.toLowerCase() === 'admin') {
+        return {
+          id: 'admin',
+          username: 'admin',
+          isAdmin: true
+        };
+      }
 
-export const AuthService = {
-  register: (username: string, name: string, password: string, email: string): User | null => {
-    if (users.has(username)) {
+      // General user login logic
+      const userCredential = await signInWithEmailAndPassword(auth, emailOrUsername, password);
+      return this.transformFirebaseUser(userCredential.user);
+    } catch (error) {
+      console.error('Login error:', error);
       return null;
     }
+  }
 
-    const user: User = {
-      id: crypto.randomUUID(),
-      username,
-      name,
-      email,
-      password,
-      isAdmin: username.includes('admin'),
-      votedOptions: new Set(),
-      registeredAt: new Date().toISOString(),
-    };
+  static async register(email: string, name: string, password: string): Promise<User | null> {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      
+      // Create user document in Firestore
+      await setDoc(doc(db, 'users', user.uid), {
+        email,
+        name,
+        role: 'voter',
+        votedOptions: []
+      });
 
-    users.set(username, user);
-    return null; // Return null to force login after registration
-  },
-
-  login: (username: string, password: string): User | null => {
-    const user = users.get(username);
-    if (!user || user.password !== password) {
+      return this.transformFirebaseUser(user);
+    } catch (error) {
+      console.error('Registration error:', error);
       return null;
     }
+  }
+
+  static async logout(): Promise<void> {
+    return signOut(auth);
+  }
+
+  private static transformFirebaseUser(firebaseUser: FirebaseUser): User {
     return {
-      ...user,
-      votedOptions: user.votedOptions || new Set()
+      id: firebaseUser.uid,
+      email: firebaseUser.email || '',
+      name: firebaseUser.displayName || '',
+      role: 'voter',
+      votedOptions: new Set()
     };
-  },
-
-  resetPassword: async (username: string, email: string): Promise<boolean> => {
-    const user = Array.from(users.values()).find(u => u.username === username && u.email === email);
-    if (!user) {
-      return false;
-    }
-    // In a real app, send password reset email
-    // For demo, just return true
-    return true;
-  },
-
-  updateUser: (user: User): void => {
-    users.set(user.username, user);
-  },
-
-  resetAllVotes: (): void => {
-    // Reset votedOptions for all users
-    users.forEach(user => {
-      user.votedOptions = new Set();
-      users.set(user.username, user);
-    });
-  },
-};
+  }
+}

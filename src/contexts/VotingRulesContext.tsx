@@ -1,42 +1,52 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
+import { db } from '../config/firebase';
 import type { VotingOption } from '../types';
 
 interface VotingRulesContextType {
   votingOptions: VotingOption[];
-  updateVotingOption: (option: VotingOption) => void;
-  addVotingOption: (option: VotingOption) => void;
-  removeVotingOption: (optionId: string) => void;
+  addVotingOption: (option: VotingOption) => Promise<void>;
+  updateVotingOption: (option: VotingOption) => Promise<void>;
+  deleteVotingOption: (id: string) => Promise<void>;
 }
 
-const initialVotingOptions: VotingOption[] = [];
-
-const VotingRulesContext = createContext<VotingRulesContextType | undefined>(undefined);
+const VotingRulesContext = createContext<VotingRulesContextType | null>(null);
 
 export function VotingRulesProvider({ children }: { children: React.ReactNode }) {
-  const [votingOptions, setVotingOptions] = useState<VotingOption[]>(initialVotingOptions);
+  const [votingOptions, setVotingOptions] = useState<VotingOption[]>([]);
 
-  const updateVotingOption = (updatedOption: VotingOption) => {
-    setVotingOptions(options =>
-      options.map(option =>
-        option.id === updatedOption.id ? updatedOption : option
-      )
-    );
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, 'votingOptions'), (snapshot) => {
+      const options = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as VotingOption[];
+      setVotingOptions(options);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const addVotingOption = async (option: VotingOption) => {
+    await addDoc(collection(db, 'votingOptions'), option);
   };
 
-  const addVotingOption = (newOption: VotingOption) => {
-    setVotingOptions(options => [...options, newOption]);
+  const updateVotingOption = async (option: VotingOption) => {
+    const docRef = doc(db, 'votingOptions', option.id);
+    await updateDoc(docRef, option);
   };
 
-  const removeVotingOption = (optionId: string) => {
-    setVotingOptions(options => options.filter(option => option.id !== optionId));
+  const deleteVotingOption = async (id: string) => {
+    const docRef = doc(db, 'votingOptions', id);
+    await deleteDoc(docRef);
   };
 
   return (
     <VotingRulesContext.Provider value={{
       votingOptions,
-      updateVotingOption,
       addVotingOption,
-      removeVotingOption
+      updateVotingOption,
+      deleteVotingOption
     }}>
       {children}
     </VotingRulesContext.Provider>
@@ -45,7 +55,7 @@ export function VotingRulesProvider({ children }: { children: React.ReactNode })
 
 export function useVotingRules() {
   const context = useContext(VotingRulesContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useVotingRules must be used within a VotingRulesProvider');
   }
   return context;

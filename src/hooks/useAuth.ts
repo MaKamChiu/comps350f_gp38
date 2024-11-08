@@ -8,7 +8,7 @@ export function useAuth() {
 
   const login = useCallback(async (username: string, password: string) => {
     try {
-      const user = AuthService.login(username, password);
+      const user = await AuthService.login(username, password); // 加入 await
       if (!user) {
         setError('Invalid username or password');
         return false;
@@ -21,7 +21,7 @@ export function useAuth() {
       return false;
     }
   }, []);
-
+  
   const register = useCallback(async (username: string, name: string, password: string) => {
     try {
       const user = AuthService.register(username, name, password);
