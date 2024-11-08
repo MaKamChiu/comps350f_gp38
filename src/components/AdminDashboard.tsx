@@ -85,7 +85,7 @@ export default function AdminDashboard({
           <div className="flex items-center">
             <Users className="w-8 h-8 text-indigo-600" />
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total Topics</p>
+              <p className="text-sm font-medium text-gray-600">{t('voting.totalTopics')}</p>
               <p className="text-2xl font-semibold text-gray-900">{votingOptions.length}</p>
             </div>
           </div>
@@ -95,7 +95,7 @@ export default function AdminDashboard({
           <div className="flex items-center">
             <Activity className="w-8 h-8 text-green-600" />
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total Votes</p>
+              <p className="text-sm font-medium text-gray-600">{t('voting.totalVotes')}</p>
               <p className="text-2xl font-semibold text-gray-900">{totalVotes}</p>
             </div>
           </div>
@@ -105,7 +105,7 @@ export default function AdminDashboard({
           <div className="flex items-center">
             <BarChart3 className="w-8 h-8 text-blue-600" />
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Active Topics</p>
+              <p className="text-sm font-medium text-gray-600">{t('voting.activeTopics')}</p>
               <p className="text-2xl font-semibold text-gray-900">
                 {votingOptions.filter(option => option.candidates.length > 0).length}
               </p>
@@ -153,14 +153,14 @@ export default function AdminDashboard({
                   onClick={() => setShowNewOptionForm(false)}
                   className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800"
                 >
-                  Cancel
+                  {t('candidates.cancel')}
                 </button>
                 <button
                   onClick={handleAddOption}
                   className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm"
                   disabled={!newOptionForm.name || !newOptionForm.description || !newOptionForm.maxSelections}
                 >
-                  Add Topic
+                  {t('voting.addtopic')}
                 </button>
               </div>
             </div>

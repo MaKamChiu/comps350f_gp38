@@ -2,12 +2,15 @@ import React, { useState } from 'react';
 import { Edit2, Plus, Trash2, Save } from 'lucide-react';
 import type { Candidate, VotingOption } from '../../types';
 import { useVotingRules } from '../../contexts/VotingRulesContext';
+import { useTranslation } from 'react-i18next';
+
 
 interface CandidateManagementProps {
   selectedOption: VotingOption;
 }
 
 export default function CandidateManagement({ selectedOption }: CandidateManagementProps) {
+  const { t } = useTranslation();
   const { updateVotingOption } = useVotingRules();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -64,7 +67,7 @@ export default function CandidateManagement({ selectedOption }: CandidateManagem
   const renderForm = (isEditing: boolean) => (
     <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
       <div>
-        <label className="block text-sm font-medium text-gray-700">Name</label>
+        <label className="block text-sm font-medium text-gray-700">{t('candidates.cName')}</label>
         <input
           type="text"
           value={editForm.name || ''}
@@ -73,7 +76,7 @@ export default function CandidateManagement({ selectedOption }: CandidateManagem
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700">Position</label>
+        <label className="block text-sm font-medium text-gray-700">{t('candidates.cPosition')}</label>
         <input
           type="text"
           value={editForm.position || ''}
@@ -82,7 +85,7 @@ export default function CandidateManagement({ selectedOption }: CandidateManagem
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700">Description</label>
+        <label className="block text-sm font-medium text-gray-700">{t('candidates.cDescription')}</label>
         <textarea
           value={editForm.description || ''}
           onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
@@ -91,7 +94,7 @@ export default function CandidateManagement({ selectedOption }: CandidateManagem
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700">Image URL</label>
+        <label className="block text-sm font-medium text-gray-700">{t('candidates.ImageURL')}</label>
         <input
           type="url"
           value={editForm.imageUrl || ''}
@@ -108,15 +111,14 @@ export default function CandidateManagement({ selectedOption }: CandidateManagem
           }}
           className="px-3 py-2 text-sm text-gray-600 hover:text-gray-800"
         >
-          Cancel
+          {t('candidates.cancel')}
         </button>
         <button
           onClick={isEditing ? handleSave : handleAdd}
           className="flex items-center space-x-1 px-3 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm"
         >
           <Save className="w-4 h-4" />
-          <span>{isEditing ? 'Save Changes' : 'Add Candidate'}</span>
-        </button>
+          <span>{isEditing ? t('common.saveChanges') : t('candidates.addcandidate')}</span>        </button>
       </div>
     </div>
   );
@@ -125,7 +127,7 @@ export default function CandidateManagement({ selectedOption }: CandidateManagem
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
         <h3 className="text-lg font-medium text-gray-900">
-          Manage Candidates for {selectedOption.name}
+        {t('candidates.managecandidates')} {selectedOption.name}
         </h3>
         {!showAddForm && (
           <button
@@ -133,7 +135,7 @@ export default function CandidateManagement({ selectedOption }: CandidateManagem
             className="flex items-center space-x-1 px-3 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm"
           >
             <Plus className="w-4 h-4" />
-            <span>Add Candidate</span>
+            <span>{t('candidates.addcandidate')}</span>
           </button>
         )}
       </div>
@@ -151,7 +153,7 @@ export default function CandidateManagement({ selectedOption }: CandidateManagem
                     <h4 className="text-lg font-medium text-gray-900">{candidate.name}</h4>
                     <p className="text-sm text-gray-600">{candidate.position}</p>
                     <p className="text-sm text-gray-500">{candidate.description}</p>
-                    <p className="text-sm text-gray-500">Current Votes: {candidate.votes}</p>
+                    <p className="text-sm text-gray-500">{t('voting.CurrentVotes')}: {candidate.votes}</p>
                   </div>
                   <div className="flex space-x-2">
                     <button
