@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { UserCircle2, Lock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface LoginFormProps {
   onLogin: (username: string, password: string) => void;
@@ -8,6 +9,7 @@ interface LoginFormProps {
 }
 
 export default function LoginForm({ onLogin, onToggleForm, onForgotPassword }: LoginFormProps) {
+  const { t } = useTranslation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
@@ -25,7 +27,7 @@ export default function LoginForm({ onLogin, onToggleForm, onForgotPassword }: L
       <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
         <div className="rounded-md shadow-sm -space-y-px">
           <div>
-            <label htmlFor="username" className="sr-only">Username</label>
+            <label htmlFor="username" className="sr-only">{t('common.Username')}</label>
             <input
               id="username"
               type="text"
@@ -37,7 +39,7 @@ export default function LoginForm({ onLogin, onToggleForm, onForgotPassword }: L
             />
           </div>
           <div>
-            <label htmlFor="password" className="sr-only">Password</label>
+            <label htmlFor="password" className="sr-only">{t('common.Password')}</label>
             <input
               id="password"
               type="password"
@@ -57,7 +59,7 @@ export default function LoginForm({ onLogin, onToggleForm, onForgotPassword }: L
               onClick={onForgotPassword}
               className="font-medium text-indigo-600 hover:text-indigo-500"
             >
-              Forgot your password?
+              {t('common.ForgotPw')}
             </button>
           </div>
         </div>
@@ -70,7 +72,7 @@ export default function LoginForm({ onLogin, onToggleForm, onForgotPassword }: L
             <span className="absolute left-0 inset-y-0 flex items-center pl-3">
               <Lock className="h-5 w-5 text-indigo-500 group-hover:text-indigo-400" />
             </span>
-            Sign in
+            {t('common.Signin')}
           </button>
         </div>
       </form>
@@ -79,7 +81,7 @@ export default function LoginForm({ onLogin, onToggleForm, onForgotPassword }: L
           onClick={onToggleForm}
           className="text-sm text-indigo-600 hover:text-indigo-500"
         >
-          Need an account? Register
+          {t('common.NeedRegister')}
         </button>
       </div>
     </div>
