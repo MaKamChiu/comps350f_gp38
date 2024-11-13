@@ -1,66 +1,61 @@
 import { useState, useCallback } from 'react';
 import { AuthService } from '../services/auth';
-import type { User } from '../types';
+
+interface User {
+  id: string;
+  email: string;
+  name: string;
+  isAdmin: boolean;
+  votedOptions: Set<string>;
+}
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const login = useCallback(async (username: string, password: string) => {
+  const login = useCallback(async (email: string, password: string) => {
     try {
-      const user = AuthService.login(username, password);
-      if (!user) {
-        setError('Invalid username or password');
-        return false;
-      }
-      setUser(user);
       setError(null);
-      return true;
+      const userData = await AuthService.login(email, password);
+      setUser(userData);
     } catch (err) {
-      setError('An error occurred during login');
-      return false;
+      setError('Invalid email or password');
+      console.error('Login error:', err);
     }
   }, []);
 
-  const register = useCallback(async (username: string, name: string, password: string) => {
+  const register = useCallback(async (email: string, displayName: string, password: string) => {
     try {
-      const user = AuthService.register(username, name, password);
-      if (!user) {
-        setError('Username already exists');
-        return false;
-      }
-      setUser(user);
       setError(null);
-      return true;
+      const userData = await AuthService.register(email, displayName, password);
+      setUser(userData);
     } catch (err) {
-      setError('An error occurred during registration');
-      return false;
+      setError('Registration failed. Please try again.');
+      console.error('Registration error:', err);
     }
   }, []);
 
-  const resetPassword = useCallback(async (username: string, email: string) => {
+  const resetPassword = useCallback(async (email: string) => {
     try {
-      const success = await AuthService.resetPassword(username, email);
-      if (!success) {
-        setError('User not found');
-        return false;
-      }
       setError(null);
-      return true;
+      await AuthService.resetPassword(email);
     } catch (err) {
-      setError('An error occurred while resetting password');
-      return false;
+      setError('Password reset failed. Please try again.');
+      console.error('Password reset error:', err);
     }
   }, []);
 
-  const logout = useCallback(() => {
-    setUser(null);
-    setError(null);
+  const logout = useCallback(async () => {
+    try {
+      await AuthService.logout();
+      setUser(null);
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
   }, []);
 
-  const updateUser = useCallback((updatedUser: User) => {
-    AuthService.updateUser(updatedUser);
-    setUser(updatedUser);
+  const updateUser = useCallback((userData: User) => {
+    setUser(userData);
   }, []);
 
   return {
@@ -70,6 +65,6 @@ export function useAuth() {
     register,
     resetPassword,
     logout,
-    updateUser,
+    updateUser
   };
 }

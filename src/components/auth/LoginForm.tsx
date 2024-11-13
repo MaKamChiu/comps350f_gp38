@@ -2,18 +2,18 @@ import React, { useState } from 'react';
 import { UserCircle2, Lock } from 'lucide-react';
 
 interface LoginFormProps {
-  onLogin: (username: string, password: string) => void;
+  onLogin: (email: string, password: string) => void;
   onToggleForm: () => void;
   onForgotPassword: () => void;
 }
 
 export default function LoginForm({ onLogin, onToggleForm, onForgotPassword }: LoginFormProps) {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onLogin(username, password);
+    onLogin(email, password);
   };
 
   return (
@@ -25,15 +25,15 @@ export default function LoginForm({ onLogin, onToggleForm, onForgotPassword }: L
       <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
         <div className="rounded-md shadow-sm -space-y-px">
           <div>
-            <label htmlFor="username" className="sr-only">Username</label>
+            <label htmlFor="email" className="sr-only">Email</label>
             <input
-              id="username"
-              type="text"
+              id="email"
+              type="email"
               required
               className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
           <div>

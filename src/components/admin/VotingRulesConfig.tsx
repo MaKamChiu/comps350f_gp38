@@ -6,7 +6,7 @@ import type { VotingOption } from '../../types';
 
 export default function VotingRulesConfig() {
   const { t } = useTranslation();
-  const { votingOptions, addVotingOption, updateVotingOption, deleteVotingOption } = useVotingRules();
+  const { votingOptions, addVotingOption, updateVotingOption } = useVotingRules();
   const [newOption, setNewOption] = useState<Partial<VotingOption>>({});
 
   const handleAddOption = () => {
@@ -94,7 +94,7 @@ export default function VotingRulesConfig() {
               <div className="flex justify-between items-start mb-4">
                 <h4 className="text-lg font-medium text-gray-900">{option.name}</h4>
                 <button
-                  onClick={() => deleteVotingOption(option.id)}
+                  onClick={() => (option.id)}
                   className="text-gray-400 hover:text-red-600"
                 >
                   <Trash2 className="w-4 h-4" />

@@ -17,6 +17,16 @@ export function App() {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [ballots, setBallots] = useState<BallotRecord[]>([]);
 
+  const handleResetPassword = async (email: string) => {
+    try {
+      await resetPassword(email);
+      // Success message is handled in the ForgotPasswordForm component
+    } catch (error) {
+      console.error('Password reset error:', error);
+      throw error;
+    }
+  };
+
   const handleVote = (optionId: string, candidateId: string) => {
     if (!user || (user.votedOptions && user.votedOptions.has(optionId))) return;
 
@@ -93,7 +103,7 @@ export function App() {
           )}
           {showForgotPassword ? (
             <ForgotPasswordForm
-              onSubmit={resetPassword}
+              onSubmit={handleResetPassword}
               onBack={() => {
                 setShowForgotPassword(false);
                 setShowLogin(true);
