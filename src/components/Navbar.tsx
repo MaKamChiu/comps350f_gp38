@@ -1,49 +1,38 @@
 import React from 'react';
-import { Vote, LogOut, HelpCircle } from 'lucide-react';
-import LanguageSelector from './LanguageSelector';
 import { useTranslation } from 'react-i18next';
+import type { User } from '../types';
 
 interface NavbarProps {
-  user: { name: string; isAdmin: boolean } | null;
-  onLogout: () => void;
-  onHelpClick?: () => void;
+  user: User | null;
+  onLogout: () => Promise<void>;
+  children?: React.ReactNode;
 }
 
-export default function Navbar({ user, onLogout, onHelpClick }: NavbarProps) {
+export default function Navbar({ user, onLogout, children }: NavbarProps) {
   const { t } = useTranslation();
 
   return (
-    <nav className="bg-indigo-600 text-white shadow-lg">
+    <nav className="bg-white shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
-          <div className="flex items-center space-x-2">
-            <Vote className="w-8 h-8" />
-            <span className="font-bold text-xl">SecureVote</span>
+          <div className="flex-shrink-0">
+            <h1 className="text-xl font-bold text-indigo-600">
+              {t('common.welcome')}
+            </h1>
           </div>
           
-          <div className="flex items-center space-x-6">
-            <LanguageSelector />
-            
+          <div className="flex items-center space-x-4">
+            {children}
             {user && (
               <div className="flex items-center space-x-4">
-                <span className="text-sm">
-                  {t('common.welcome')}, {user.name} {user.isAdmin && `(${t('common.admin')})`}
+                <span className="text-gray-700">
+                  {user.name} {user.isAdmin && `(${t('common.admin')})`}
                 </span>
-                {onHelpClick && (
-                  <button
-                    onClick={onHelpClick}
-                    className="flex items-center space-x-1 bg-indigo-700 hover:bg-indigo-800 px-3 py-2 rounded-md text-sm"
-                  >
-                    <HelpCircle className="w-4 h-4" />
-                    <span>{t('common.help')}</span>
-                  </button>
-                )}
                 <button
                   onClick={onLogout}
-                  className="flex items-center space-x-1 bg-indigo-700 hover:bg-indigo-800 px-3 py-2 rounded-md text-sm"
+                  className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
-                  <LogOut className="w-4 h-4" />
-                  <span>{t('common.logout')}</span>
+                  {t('common.logout')}
                 </button>
               </div>
             )}

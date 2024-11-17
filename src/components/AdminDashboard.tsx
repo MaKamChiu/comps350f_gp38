@@ -5,6 +5,7 @@ import AuditLog from './admin/AuditLog';
 import VotingReport from './admin/VotingReport';
 import VotingTopicsList from './admin/VotingTopicsList';
 import { useVotingRules } from '../contexts/VotingRulesContext';
+import { VotingService } from '../services/votingService';
 import { useTranslation } from 'react-i18next';
 
 interface AdminDashboardProps {
@@ -27,12 +28,17 @@ export default function AdminDashboard({
   const [newOptionForm, setNewOptionForm] = useState({
     name: '',
     description: '',
-    maxSelections: '1' // Changed to string to handle input properly
+    maxSelections: '1'
   });
 
-  const handleRestartVoting = () => {
-    onRestartVoting();
-    setShowConfirmRestart(false);
+  const handleRestartVoting = async () => {
+    try {
+      await VotingService.resetAllVotes();
+      onRestartVoting();
+      setShowConfirmRestart(false);
+    } catch (error) {
+      console.error('Error resetting votes:', error);
+    }
   };
 
   const handleAddOption = () => {
@@ -46,7 +52,14 @@ export default function AdminDashboard({
       name: newOptionForm.name,
       description: newOptionForm.description,
       maxSelections: Math.max(1, maxSelections),
-      candidates: []
+      candidates: [],
+      title: '',
+      startDate: '',
+      endDate: '',
+      type: 'single',
+      status: 'draft',
+      createdBy: '',
+      updatedAt: ''
     };
     addVotingOption(newOption);
     setShowNewOptionForm(false);

@@ -1,42 +1,79 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { VotingService } from '../services/votingService';
 import type { VotingOption } from '../types';
 
 interface VotingRulesContextType {
   votingOptions: VotingOption[];
-  updateVotingOption: (option: VotingOption) => void;
-  addVotingOption: (option: VotingOption) => void;
-  removeVotingOption: (optionId: string) => void;
+  addVotingOption: (option: Omit<VotingOption, 'id'>) => Promise<void>;
+  updateVotingOption: (option: VotingOption) => Promise<void>;
+  removeVotingOption: (id: string) => Promise<void>;
+  loading: boolean;
+  error: string | null;
 }
-
-const initialVotingOptions: VotingOption[] = [];
 
 const VotingRulesContext = createContext<VotingRulesContextType | undefined>(undefined);
 
 export function VotingRulesProvider({ children }: { children: React.ReactNode }) {
-  const [votingOptions, setVotingOptions] = useState<VotingOption[]>(initialVotingOptions);
+  const [votingOptions, setVotingOptions] = useState<VotingOption[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const updateVotingOption = (updatedOption: VotingOption) => {
-    setVotingOptions(options =>
-      options.map(option =>
-        option.id === updatedOption.id ? updatedOption : option
-      )
-    );
+  useEffect(() => {
+    loadVotingOptions();
+  }, []);
+
+  async function loadVotingOptions() {
+    try {
+      const options = await VotingService.getAllVotingOptions();
+      setVotingOptions(options);
+    } catch (err) {
+      setError('Failed to load voting options');
+      console.error('Error loading voting options:', err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const addVotingOption = async (option: Omit<VotingOption, 'id'>) => {
+    try {
+      const newOption = await VotingService.addVotingOption(option);
+      setVotingOptions([...votingOptions, newOption]);
+    } catch (err) {
+      setError('Failed to add voting option');
+      console.error('Error adding voting option:', err);
+    }
   };
 
-  const addVotingOption = (newOption: VotingOption) => {
-    setVotingOptions(options => [...options, newOption]);
+  const updateVotingOption = async (option: VotingOption) => {
+    try {
+      await VotingService.updateVotingOption(option);
+      setVotingOptions(votingOptions.map(opt => 
+        opt.id === option.id ? option : opt
+      ));
+    } catch (err) {
+      setError('Failed to update voting option');
+      console.error('Error updating voting option:', err);
+    }
   };
 
-  const removeVotingOption = (optionId: string) => {
-    setVotingOptions(options => options.filter(option => option.id !== optionId));
+  const removeVotingOption = async (id: string) => {
+    try {
+      await VotingService.removeVotingOption(id);
+      setVotingOptions(votingOptions.filter(opt => opt.id !== id));
+    } catch (err) {
+      setError('Failed to remove voting option');
+      console.error('Error removing voting option:', err);
+    }
   };
 
   return (
     <VotingRulesContext.Provider value={{
       votingOptions,
-      updateVotingOption,
       addVotingOption,
-      removeVotingOption
+      updateVotingOption,
+      removeVotingOption,
+      loading,
+      error
     }}>
       {children}
     </VotingRulesContext.Provider>

@@ -1,13 +1,6 @@
 import { useState, useCallback } from 'react';
 import { AuthService } from '../services/auth';
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  isAdmin: boolean;
-  votedOptions: Set<string>;
-}
+import type { User } from '../types';
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
@@ -47,15 +40,24 @@ export function useAuth() {
 
   const logout = useCallback(async () => {
     try {
+      if (user) {
+        // Ensure votedOptions is saved before logout
+        await AuthService.updateUserProfile(user.id, { votedOptions: user.votedOptions });
+      }
       await AuthService.logout();
       setUser(null);
     } catch (err) {
       console.error('Logout error:', err);
     }
-  }, []);
+  }, [user]);
 
-  const updateUser = useCallback((userData: User) => {
-    setUser(userData);
+  const updateUser = useCallback(async (userData: User) => {
+    try {
+      await AuthService.updateUserProfile(userData.id, userData);
+      setUser(userData);
+    } catch (err) {
+      console.error('Update user error:', err);
+    }
   }, []);
 
   return {

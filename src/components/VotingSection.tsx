@@ -17,7 +17,7 @@ export default function VotingSection({
   const [selectedCandidates, setSelectedCandidates] = useState<Set<string>>(new Set());
 
   const handleCandidateSelect = (candidateId: string) => {
-    if (!selectedOption) return;
+    if (!selectedOption || votedOptions.has(selectedOption.id)) return;
 
     const newSelected = new Set(selectedCandidates);
     if (newSelected.has(candidateId)) {
@@ -31,7 +31,7 @@ export default function VotingSection({
   };
 
   const handleVoteSubmit = () => {
-    if (!selectedOption) return;
+    if (!selectedOption || votedOptions.has(selectedOption.id)) return;
     selectedCandidates.forEach(candidateId => {
       onVote(selectedOption.id, candidateId);
     });
