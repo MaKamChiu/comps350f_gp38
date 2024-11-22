@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import LoginForm from './components/auth/LoginForm';
 import RegisterForm from './components/auth/RegisterForm';
@@ -11,15 +11,22 @@ import { useVotingRules } from './contexts/VotingRulesContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 import LanguageSelector from './components/LanguageSelector';
 import { useTranslation } from 'react-i18next';
-import type { Candidate, BallotRecord, VotingOption, User } from './types';
+import type { BallotRecord, User } from './types';
 
 export function App() {
-  const { user, error, login, register, resetPassword, logout, updateUser } = useAuth();
+  const { user, error, loading, login, register, resetPassword, logout, updateUser } = useAuth();
   const { votingOptions, updateVotingOption } = useVotingRules();
   const [showLogin, setShowLogin] = useState(true);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const [ballots, setBallots] = useState<BallotRecord[]>([]);
   const { t } = useTranslation();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      </div>
+    );
+  }
 
   const handleResetPassword = async (email: string) => {
     try {
@@ -52,7 +59,6 @@ export function App() {
       });
 
       // Update local state
-      setBallots([...ballots, ballot]);
       const option = votingOptions.find(opt => opt.id === optionId);
       if (option) {
         const updatedCandidates = option.candidates.map(candidate =>
@@ -83,7 +89,6 @@ export function App() {
   const handleRestartVoting = async () => {
     try {
       await VotingService.resetAllVotes();
-      setBallots([]);
       
       if (user) {
         const updatedUser: User = {
@@ -147,7 +152,6 @@ export function App() {
               <AdminDashboard
                 votingOptions={votingOptions}
                 onRestartVoting={handleRestartVoting}
-                ballots={ballots}
               />
             ) : (
               <VotingSection

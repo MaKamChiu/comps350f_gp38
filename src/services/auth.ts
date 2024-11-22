@@ -7,7 +7,6 @@ import {
   updateProfile
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, collection, updateDoc } from 'firebase/firestore';
-import { VotingService } from './votingService';
 import type { User } from '../types';
 
 const USERS_COLLECTION = 'users';
@@ -20,30 +19,19 @@ export const AuthService = {
       throw new Error('User email is required');
     }
 
-    const userDocRef = doc(db, USERS_COLLECTION, userCredential.user.uid);
-    const userDoc = await getDoc(userDocRef);
-    
-    if (!userDoc.exists()) {
-      throw new Error('User data not found');
-    }
-    
-    const userData = userDoc.data();
+    const userData = await this.getUserData(userCredential.user.uid);
     
     // Update last login timestamp
-    await updateDoc(userDocRef, {
+    await updateDoc(doc(db, USERS_COLLECTION, userCredential.user.uid), {
       lastLoginAt: new Date().toISOString()
     });
-
-    // Convert votedOptions array to Set
-    const votedOptionsArray = userData.votedOptions || [];
-    const votedOptionsSet = new Set<string>(votedOptionsArray);
 
     return {
       id: userCredential.user.uid,
       email: userCredential.user.email,
       name: userData.displayName,
       isAdmin: userData.isAdmin || false,
-      votedOptions: votedOptionsSet,
+      votedOptions: new Set<string>(userData.votedOptions || []),
       lastLoginAt: userData.lastLoginAt
     };
   },
@@ -107,6 +95,14 @@ export const AuthService = {
     await signOut(auth);
   },
 
+  async getUserData(userId: string): Promise<any> {
+    const userDoc = await getDoc(doc(db, USERS_COLLECTION, userId));
+    if (!userDoc.exists()) {
+      throw new Error('User data not found');
+    }
+    return userDoc.data();
+  },
+
   async updateUserProfile(userId: string, data: Partial<User>): Promise<void> {
     const userDocRef = doc(db, USERS_COLLECTION, userId);
     
@@ -123,13 +119,5 @@ export const AuthService = {
   async checkAdminStatus(userId: string): Promise<boolean> {
     const userDoc = await getDoc(doc(db, USERS_COLLECTION, userId));
     return userDoc.exists() ? userDoc.data().isAdmin : false;
-  },
-
-  async deactivateUser(userId: string): Promise<void> {
-    const userDocRef = doc(db, USERS_COLLECTION, userId);
-    await updateDoc(userDocRef, {
-      status: 'inactive',
-      deactivatedAt: new Date().toISOString()
-    });
   }
 };

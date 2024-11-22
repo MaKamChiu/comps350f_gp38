@@ -1,10 +1,42 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { AuthService } from '../services/auth';
+import { auth } from '../firebaseConfig';
+import { onAuthStateChanged } from 'firebase/auth';
 import type { User } from '../types';
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      try {
+        if (firebaseUser) {
+          // Get additional user data from Firestore
+          const userData = await AuthService.getUserData(firebaseUser.uid);
+          setUser({
+            id: firebaseUser.uid,
+            email: firebaseUser.email!,
+            name: userData.displayName,
+            isAdmin: userData.isAdmin || false,
+            votedOptions: new Set(userData.votedOptions || []),
+            lastLoginAt: userData.lastLoginAt
+          });
+        } else {
+          setUser(null);
+        }
+      } catch (err) {
+        console.error('Auth state change error:', err);
+        setError('Authentication error');
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    // Cleanup subscription
+    return () => unsubscribe();
+  }, []);
 
   const login = useCallback(async (email: string, password: string) => {
     try {
@@ -63,6 +95,7 @@ export function useAuth() {
   return {
     user,
     error,
+    loading,
     login,
     register,
     resetPassword,

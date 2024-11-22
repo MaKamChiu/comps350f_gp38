@@ -11,7 +11,9 @@ import {
   arrayUnion,
   getDoc,
   query,
-  where
+  where,
+  orderBy,
+  Timestamp
 } from 'firebase/firestore';
 import type { VotingOption, Candidate, BallotRecord } from '../types';
 
@@ -88,12 +90,15 @@ export const VotingService = {
   async recordVote(ballot: Omit<BallotRecord, 'timestamp' | 'verified'>): Promise<void> {
     const batch = writeBatch(db);
     
-    // Add ballot record
+    // Add ballot record with a unique ID
     const ballotRef = doc(collection(db, BALLOTS_COLLECTION));
     const newBallot = {
       ...ballot,
+      id: ballotRef.id,
       timestamp: serverTimestamp(),
-      verified: false
+      verified: false,
+      ipAddress: window.location.hostname,
+      deviceInfo: navigator.userAgent
     };
     batch.set(ballotRef, newBallot);
 
@@ -115,18 +120,28 @@ export const VotingService = {
   },
 
   async getAllBallots(): Promise<BallotRecord[]> {
-    const snapshot = await getDocs(collection(db, BALLOTS_COLLECTION));
-    return snapshot.docs.map(doc => ({
+    const ballotsQuery = query(
+      collection(db, BALLOTS_COLLECTION),
+      orderBy('timestamp', 'desc')
+    );
+    
+    const snapshot = await getDocs(ballotsQuery);
+    return snapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        ...data,
         id: doc.id,
-        ...doc.data()
-    })) as unknown as BallotRecord[];
+        timestamp: (data.timestamp as Timestamp).toDate(),
+      } as BallotRecord;
+    });
   },
 
-  async verifyBallot(ballotId: string): Promise<void> {
+  async verifyBallot(ballotId: string, verifiedBy: string): Promise<void> {
     const ballotRef = doc(db, BALLOTS_COLLECTION, ballotId);
     await updateDoc(ballotRef, {
       verified: true,
-      verifiedAt: serverTimestamp()
+      verifiedAt: serverTimestamp(),
+      verifiedBy
     });
   },
 
