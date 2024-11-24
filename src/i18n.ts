@@ -13,7 +13,22 @@ const resources = {
         confirm: 'Confirm',
         startDate: 'Start Date',
         endDate: 'End Date',
-        saveChanges: 'Save Changes'
+        saveChanges: 'Save Changes',
+        backToLogin: 'Back to Login',
+        forgotyourpassword: 'Forgot your password?',
+        Signintovote: 'Sign in to vote',
+        signin: 'Sign in',
+        NeedanaccountRegister: 'Need an account? Register',
+        sending: 'Sending...',
+        RegistertoVote: 'Register to Vote',
+        alreadyhaveanaccount: 'Already have an account? Sign in',
+        Register: 'Register',
+        AvailableVotingTopics: 'Available Voting Topics',
+        Selectatopictocastyourvote: 'Select a topic to cast your vote',
+        Maximumselections: 'Maximum selections:',
+        Youhavealreadyvotedinthistopic: 'You have already voted in this topic',
+        ViewCandidates: 'View Candidates',
+        HideCandidates: 'Hide Candidates'
       },
       admin: {
         dashboard: 'Admin Dashboard',
@@ -37,6 +52,13 @@ const resources = {
         cPosition: 'Position',
         cDescription: 'Description',
         ImageURL: 'Image URL',
+        maxCandidatesReached: 'Maximum number of candidates ({{max}}) has been reached.'
+      },
+      auth: {
+        resetPassword: 'Reset Password',
+        emailPlaceholder: 'Email',
+        sendResetInstructions: 'Send Reset Instructions',
+        resetPasswordInstructions: 'Please enter your email address and we will send you instructions to reset your password.',
       },
       voting: {
         VotingTopics: 'Voting Topics',
@@ -64,7 +86,7 @@ const resources = {
         maxSelections: 'Maximum Selections',
         votingPeriod: 'Voting Period',
         requireVerification: 'Require Voter Verification',
-        showResultsLive: 'Show Results Live'
+        showResultsLive: 'Show Results Live',
       }
     }
   },
@@ -79,7 +101,22 @@ const resources = {
         confirm: 'Confirmar',
         startDate: 'Fecha de inicio',
         endDate: 'Fecha de fin',
-        saveChanges: 'Guardar cambios'
+        saveChanges: 'Guardar cambios',
+        backToLogin: 'Volver al inicio de sesión',
+        forgotyourpassword: '¿Olvidaste tu contraseña?',
+        Signintovote: 'Iniciar sesión para votar',
+        signin: 'Iniciar sesión',
+        NeedanaccountRegister: '¿Necesitas una cuenta? Regístrate',
+        sending: 'Enviando...',
+        RegistertoVote: 'Regístrese para votar',
+        alreadyhaveanaccount: '¿Ya tienes una cuenta? Iniciar sesión',
+        Register: 'Registrarse',
+        AvailableVotingTopics: 'Temas de votación disponibles',
+        Selectatopictocastyourvote: 'Selecciona un tema para emitir tu voto',
+        Maximumselections: 'Selecciones máximas:',
+        Youhavealreadyvotedinthistopic: 'Ya has votado en este tema',
+        ViewCandidates: 'Ver candidatos',
+        HideCandidates: 'Ocultar candidatos'
       },
       admin: {
         dashboard: 'Panel de administración',
@@ -103,6 +140,13 @@ const resources = {
         cPosition: 'Posición',
         cDescription: 'Descripción',
         ImageURL: 'URL de la imagen',
+        maxCandidatesReached: 'Se ha alcanzado el número máximo de candidatos ({{max}}).'
+      },
+      auth: {
+        resetPassword: 'Restablecer contraseña',
+        emailPlaceholder: 'Correo electrónico',
+        sendResetInstructions: 'Enviar instrucciones de restablecimiento',
+        resetPasswordInstructions: 'Por favor, introduzca su dirección de correo electrónico y le enviaremos instrucciones para restablecer su contraseña.',
       },
       voting: {
         VotingTopics: 'Temas de votación',
@@ -145,7 +189,22 @@ const resources = {
         confirm: '确认',
         startDate: '开始日期',
         endDate: '结束日期',
-        saveChanges: '保存更改'
+        saveChanges: '保存更改',
+        backToLogin: '返回登录',
+        forgotyourpassword: '忘记密码？',
+        Signintovote: '登录投票',
+        signin: '登录',
+        NeedanaccountRegister: '你沒有账户吗？注册吧!',
+        sending: '发送中...',
+        RegistertoVote: '注册投票',
+        alreadyhaveanaccount: '你已有账户啦？登录吧!',
+        Register: '注册',
+        AvailableVotingTopics: '可用投票主题',
+        Selectatopictocastyourvote: '选择一个主题投票',
+        Maximumselections: '最大选择数:',
+        Youhavealreadyvotedinthistopic: '你已经在这个主题中投票了',
+        ViewCandidates: '查看候选人',
+        HideCandidates: '隐藏候选人'
       },
       admin: {
         dashboard: '管理面板',
@@ -169,6 +228,13 @@ const resources = {
         cPosition: '职位',
         cDescription: '描述',
         ImageURL: '图片链接',
+        maxCandidatesReached: '已达到最大候选人数 ({{max}}).'
+      },
+      auth: {
+        resetPassword: '重置密码',
+        emailPlaceholder: '邮箱',
+        sendResetInstructions: '发送重置说明',
+        resetPasswordInstructions: '请输入您的电子邮件地址，我们将向您发送重置密码的说明。',
       },
       voting: {
         VotingTopics: '投票主题',

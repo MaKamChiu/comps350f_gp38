@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { UserPlus } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface RegisterFormProps {
   onRegister: (email: string, displayName: string, password: string) => void;
@@ -10,6 +11,7 @@ export default function RegisterForm({ onRegister, onToggleForm }: RegisterFormP
   const [email, setEmail] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [password, setPassword] = useState('');
+  const { t } = useTranslation();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,7 +22,7 @@ export default function RegisterForm({ onRegister, onToggleForm }: RegisterFormP
     <div className="max-w-md w-full space-y-8">
       <div className="text-center">
         <UserPlus className="mx-auto h-12 w-12 text-indigo-600" />
-        <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Register to Vote</h2>
+        <h2 className="mt-6 text-3xl font-extrabold text-gray-900">{t('common.RegistertoVote')}</h2>
       </div>
       <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
         <div className="rounded-md shadow-sm space-y-2">
@@ -66,7 +68,7 @@ export default function RegisterForm({ onRegister, onToggleForm }: RegisterFormP
             type="submit"
             className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
-            Register
+            {t('common.Register')}
           </button>
         </div>
       </form>
@@ -75,7 +77,7 @@ export default function RegisterForm({ onRegister, onToggleForm }: RegisterFormP
           onClick={onToggleForm}
           className="text-sm text-indigo-600 hover:text-indigo-500"
         >
-          Already have an account? Sign in
+          {t('common.alreadyhaveanaccount')}
         </button>
       </div>
     </div>

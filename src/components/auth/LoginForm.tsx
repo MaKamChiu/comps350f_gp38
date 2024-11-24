@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { UserCircle2, Lock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface LoginFormProps {
   onLogin: (email: string, password: string) => void;
@@ -8,6 +9,7 @@ interface LoginFormProps {
 }
 
 export default function LoginForm({ onLogin, onToggleForm, onForgotPassword }: LoginFormProps) {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -20,7 +22,7 @@ export default function LoginForm({ onLogin, onToggleForm, onForgotPassword }: L
     <div className="max-w-md w-full space-y-8">
       <div className="text-center">
         <UserCircle2 className="mx-auto h-12 w-12 text-indigo-600" />
-        <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Sign in to vote</h2>
+        <h2 className="mt-6 text-3xl font-extrabold text-gray-900">{t('common.Signintovote')}</h2>
       </div>
       <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
         <div className="rounded-md shadow-sm -space-y-px">
@@ -57,7 +59,7 @@ export default function LoginForm({ onLogin, onToggleForm, onForgotPassword }: L
               onClick={onForgotPassword}
               className="font-medium text-indigo-600 hover:text-indigo-500"
             >
-              Forgot your password?
+              {t('common.forgotyourpassword')}
             </button>
           </div>
         </div>
@@ -70,7 +72,7 @@ export default function LoginForm({ onLogin, onToggleForm, onForgotPassword }: L
             <span className="absolute left-0 inset-y-0 flex items-center pl-3">
               <Lock className="h-5 w-5 text-indigo-500 group-hover:text-indigo-400" />
             </span>
-            Sign in
+            {t('common.signin')}
           </button>
         </div>
       </form>
@@ -79,7 +81,7 @@ export default function LoginForm({ onLogin, onToggleForm, onForgotPassword }: L
           onClick={onToggleForm}
           className="text-sm text-indigo-600 hover:text-indigo-500"
         >
-          Need an account? Register
+          {t('common.NeedanaccountRegister')}
         </button>
       </div>
     </div>

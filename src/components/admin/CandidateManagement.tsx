@@ -161,7 +161,7 @@ export default function CandidateManagement({ selectedOption }: CandidateManagem
           <div className="flex items-center">
             <AlertCircle className="w-5 h-5 text-yellow-400 mr-2" />
             <p className="text-sm text-yellow-700">
-              Maximum number of candidates ({selectedOption.maxSelections}) has been reached.
+              {t('candidates.maxCandidatesReached', { max: selectedOption.maxSelections })}
             </p>
           </div>
         </div>
