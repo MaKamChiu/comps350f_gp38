@@ -28,7 +28,9 @@ const resources = {
         Maximumselections: 'Maximum selections:',
         Youhavealreadyvotedinthistopic: 'You have already voted in this topic',
         ViewCandidates: 'View Candidates',
-        HideCandidates: 'Hide Candidates'
+        HideCandidates: 'Hide Candidates',
+        Passwordresetemailhasbeensent: 'Password reset email has been sent. Please check your inbox.',
+        Passwordreseterror: 'Password reset error:'
       },
       admin: {
         dashboard: 'Admin Dashboard',
@@ -116,7 +118,9 @@ const resources = {
         Maximumselections: 'Selecciones máximas:',
         Youhavealreadyvotedinthistopic: 'Ya has votado en este tema',
         ViewCandidates: 'Ver candidatos',
-        HideCandidates: 'Ocultar candidatos'
+        HideCandidates: 'Ocultar candidatos',
+        Passwordresetemailhasbeensent: 'Se ha enviado un correo electrónico de restablecimiento de contraseña. Por favor, revise su bandeja de entrada.',
+        Passwordreseterror: 'Error al restablecer la contraseña:'
       },
       admin: {
         dashboard: 'Panel de administración',
@@ -204,7 +208,9 @@ const resources = {
         Maximumselections: '最大选择数:',
         Youhavealreadyvotedinthistopic: '你已经在这个主题中投票了',
         ViewCandidates: '查看候选人',
-        HideCandidates: '隐藏候选人'
+        HideCandidates: '隐藏候选人',
+        Passwordresetemailhasbeensent: '密码重置邮件已发送，请查看您的收件箱。',
+        Passwordreseterror: '密码重置错误:',
       },
       admin: {
         dashboard: '管理面板',

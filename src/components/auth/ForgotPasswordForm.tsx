@@ -18,10 +18,10 @@ export default function ForgotPasswordForm({ onSubmit, onBack }: ForgotPasswordF
     setIsSubmitting(true);
     try {
       await onSubmit(email);
-      setSuccessMessage('Password reset email has been sent. Please check your inbox.');
+      setSuccessMessage(t('common.Passwordresetemailhasbeensent'));
       setEmail('');
     } catch (error) {
-      console.error('Password reset error:', error);
+      console.error(t('common.Passwordreseterror'), error);
     } finally {
       setIsSubmitting(false);
     }
