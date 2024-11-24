@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "vitest",
+    "test:coverage": "vitest run --coverage",
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint .",
