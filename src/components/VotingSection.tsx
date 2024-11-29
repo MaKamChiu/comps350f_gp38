@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Check, Info } from 'lucide-react';
 import type { VotingOption } from '../types';
+import { useTranslation } from 'react-i18next';
 
 interface VotingSectionProps {
   votingOptions: VotingOption[];
@@ -13,11 +14,12 @@ export default function VotingSection({
   onVote, 
   votedOptions = new Set() 
 }: VotingSectionProps) {
+  const { t } = useTranslation();
   const [selectedOption, setSelectedOption] = useState<VotingOption | null>(null);
   const [selectedCandidates, setSelectedCandidates] = useState<Set<string>>(new Set());
 
   const handleCandidateSelect = (candidateId: string) => {
-    if (!selectedOption) return;
+    if (!selectedOption || votedOptions.has(selectedOption.id)) return;
 
     const newSelected = new Set(selectedCandidates);
     if (newSelected.has(candidateId)) {
@@ -31,7 +33,7 @@ export default function VotingSection({
   };
 
   const handleVoteSubmit = () => {
-    if (!selectedOption) return;
+    if (!selectedOption || votedOptions.has(selectedOption.id)) return;
     selectedCandidates.forEach(candidateId => {
       onVote(selectedOption.id, candidateId);
     });
@@ -41,8 +43,8 @@ export default function VotingSection({
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-900">Available Voting Topics</h2>
-        <p className="mt-2 text-gray-600">Select a topic to cast your vote</p>
+        <h2 className="text-3xl font-bold text-gray-900">  {t('common.AvailableVotingTopics')}</h2>
+        <p className="mt-2 text-gray-600">{t('common.Selectatopictocastyourvote')}</p>
       </div>
 
       <div className="grid grid-cols-1 gap-6">
@@ -52,13 +54,13 @@ export default function VotingSection({
               <h3 className="text-xl font-semibold text-gray-900">{option.name}</h3>
               <p className="text-gray-600 mt-2">{option.description}</p>
               <p className="text-sm text-gray-500 mt-2">
-                Maximum selections: {option.maxSelections}
+              {t('common.Maximumselections')} {option.maxSelections}
               </p>
 
               {votedOptions.has(option.id) ? (
                 <div className="mt-4 bg-green-50 border border-green-200 rounded-md p-4 flex items-center">
                   <Check className="w-5 h-5 text-green-500 mr-2" />
-                  <span className="text-green-700">You have already voted in this topic</span>
+                  <span className="text-green-700">{t('common.Youhavealreadyvotedinthistopic')}</span>
                 </div>
               ) : (
                 <>
@@ -66,7 +68,10 @@ export default function VotingSection({
                     onClick={() => setSelectedOption(selectedOption?.id === option.id ? null : option)}
                     className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
                   >
-                    {selectedOption?.id === option.id ? 'Hide Candidates' : 'View Candidates'}
+                  {selectedOption?.id === option.id 
+                    ? t('common.HideCandidates') 
+                      : t('common.ViewCandidates')
+                  }
                   </button>
 
                   {selectedOption?.id === option.id && (

@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { Edit2, Plus, Trash2, Save } from 'lucide-react';
+import { Edit2, Plus, Trash2, Save, AlertCircle } from 'lucide-react';
 import type { Candidate, VotingOption } from '../../types';
 import { useVotingRules } from '../../contexts/VotingRulesContext';
 import { useTranslation } from 'react-i18next';
-
 
 interface CandidateManagementProps {
   selectedOption: VotingOption;
@@ -15,6 +14,8 @@ export default function CandidateManagement({ selectedOption }: CandidateManagem
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editForm, setEditForm] = useState<Partial<Candidate>>({});
+
+  const isAtMaxCandidates = selectedOption.candidates.length >= selectedOption.maxSelections;
 
   const handleEdit = (candidate: Candidate) => {
     setEditingId(candidate.id);
@@ -40,6 +41,10 @@ export default function CandidateManagement({ selectedOption }: CandidateManagem
   };
 
   const handleAdd = () => {
+    if (isAtMaxCandidates) {
+      return;
+    }
+
     if (editForm.name && editForm.position && editForm.description && editForm.imageUrl) {
       const newCandidate: Candidate = {
         ...editForm,
@@ -118,7 +123,8 @@ export default function CandidateManagement({ selectedOption }: CandidateManagem
           className="flex items-center space-x-1 px-3 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm"
         >
           <Save className="w-4 h-4" />
-          <span>{isEditing ? t('common.saveChanges') : t('candidates.addcandidate')}</span>        </button>
+          <span>{isEditing ? t('common.saveChanges') : t('candidates.addcandidate')}</span>
+        </button>
       </div>
     </div>
   );
@@ -127,20 +133,42 @@ export default function CandidateManagement({ selectedOption }: CandidateManagem
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
         <h3 className="text-lg font-medium text-gray-900">
-        {t('candidates.managecandidates')} {selectedOption.name}
+          {t('candidates.managecandidates')} {selectedOption.name}
         </h3>
         {!showAddForm && (
-          <button
-            onClick={() => setShowAddForm(true)}
-            className="flex items-center space-x-1 px-3 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm"
-          >
-            <Plus className="w-4 h-4" />
-            <span>{t('candidates.addcandidate')}</span>
-          </button>
+          <div className="flex items-center space-x-4">
+            <div className="text-sm text-gray-600">
+              {selectedOption.candidates.length} / {selectedOption.maxSelections} candidates
+            </div>
+            <button
+              onClick={() => setShowAddForm(true)}
+              disabled={isAtMaxCandidates}
+              className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm ${
+                isAtMaxCandidates
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-indigo-600 text-white hover:bg-indigo-700'
+              }`}
+            >
+              <Plus className="w-4 h-4" />
+              <span>{t('candidates.addcandidate')}</span>
+            </button>
+          </div>
         )}
       </div>
+      
+      {isAtMaxCandidates && !editingId && (
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+          <div className="flex items-center">
+            <AlertCircle className="w-5 h-5 text-yellow-400 mr-2" />
+            <p className="text-sm text-yellow-700">
+              {t('candidates.maxCandidatesReached', { max: selectedOption.maxSelections })}
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="p-6 space-y-6">
-        {showAddForm && renderForm(false)}
+        {showAddForm && !isAtMaxCandidates && renderForm(false)}
         
         <div className="space-y-4">
           {selectedOption.candidates.map((candidate) => (

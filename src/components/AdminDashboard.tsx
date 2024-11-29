@@ -1,38 +1,40 @@
-import React, { useState } from 'react';
-import { BarChart3, Users, Activity, ClipboardList, FileText, RefreshCw, Settings, Plus } from 'lucide-react';
-import type { VotingOption, BallotRecord } from '../types';
+import React, { useState, useEffect } from 'react';
+import { BarChart3, FileText, RefreshCw, Plus } from 'lucide-react';
+import type { VotingOption } from '../types';
 import AuditLog from './admin/AuditLog';
 import VotingReport from './admin/VotingReport';
 import VotingTopicsList from './admin/VotingTopicsList';
 import { useVotingRules } from '../contexts/VotingRulesContext';
+import { VotingService } from '../services/votingService';
 import { useTranslation } from 'react-i18next';
 
 interface AdminDashboardProps {
   votingOptions: VotingOption[];
   onRestartVoting: () => void;
-  ballots: BallotRecord[];
 }
 
 export default function AdminDashboard({ 
   votingOptions,
   onRestartVoting,
-  ballots
 }: AdminDashboardProps) {
   const { t } = useTranslation();
   const { addVotingOption, removeVotingOption } = useVotingRules();
-  const [activeTab, setActiveTab] = useState<'overview' | 'manage' | 'audit' | 'report'>('overview');
-  const [showConfirmRestart, setShowConfirmRestart] = useState(false);
+  const [activeTab, setActiveTab] = useState<'audit' | 'report'>('audit');
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
   const [showNewOptionForm, setShowNewOptionForm] = useState(false);
   const [newOptionForm, setNewOptionForm] = useState({
     name: '',
     description: '',
-    maxSelections: '1' // Changed to string to handle input properly
+    maxSelections: '1'
   });
 
-  const handleRestartVoting = () => {
-    onRestartVoting();
-    setShowConfirmRestart(false);
+  const handleRestartVoting = async () => {
+    try {
+      await VotingService.resetAllVotes();
+      onRestartVoting();
+    } catch (error) {
+      console.error('Error resetting votes:', error);
+    }
   };
 
   const handleAddOption = () => {
@@ -44,9 +46,16 @@ export default function AdminDashboard({
     const newOption: VotingOption = {
       id: crypto.randomUUID(),
       name: newOptionForm.name,
+      title: newOptionForm.name,
       description: newOptionForm.description,
       maxSelections: Math.max(1, maxSelections),
-      candidates: []
+      candidates: [],
+      startDate: new Date().toISOString(),
+      endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      type: 'single',
+      status: 'active',
+      createdBy: 'system',
+      updatedAt: new Date().toISOString()
     };
     addVotingOption(newOption);
     setShowNewOptionForm(false);
@@ -76,41 +85,6 @@ export default function AdminDashboard({
             <RefreshCw className="w-4 h-4" />
             <span>{t('admin.restartVoting')}</span>
           </button>
-        </div>
-      </div>
-
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <div className="flex items-center">
-            <Users className="w-8 h-8 text-indigo-600" />
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">{t('voting.totalTopics')}</p>
-              <p className="text-2xl font-semibold text-gray-900">{votingOptions.length}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <div className="flex items-center">
-            <Activity className="w-8 h-8 text-green-600" />
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">{t('voting.totalVotes')}</p>
-              <p className="text-2xl font-semibold text-gray-900">{totalVotes}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <div className="flex items-center">
-            <BarChart3 className="w-8 h-8 text-blue-600" />
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">{t('voting.activeTopics')}</p>
-              <p className="text-2xl font-semibold text-gray-900">
-                {votingOptions.filter(option => option.candidates.length > 0).length}
-              </p>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -180,17 +154,6 @@ export default function AdminDashboard({
       <div className="border-b border-gray-200 mb-6">
         <nav className="-mb-px flex space-x-8">
           <button
-            onClick={() => setActiveTab('overview')}
-            className={`${
-              activeTab === 'overview'
-                ? 'border-indigo-500 text-indigo-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            } flex items-center whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
-          >
-            <ClipboardList className="w-5 h-5 mr-2" />
-            {t('admin.overview')}
-          </button>
-          <button
             onClick={() => setActiveTab('audit')}
             className={`${
               activeTab === 'audit'
@@ -216,7 +179,7 @@ export default function AdminDashboard({
       </div>
 
       {/* Tab Content */}
-      {activeTab === 'audit' && <AuditLog ballots={ballots} />}
+      {activeTab === 'audit' && <AuditLog votingOptions={votingOptions} />}
       {activeTab === 'report' && (
         <VotingReport votingOptions={votingOptions} totalVotes={totalVotes} />
       )}

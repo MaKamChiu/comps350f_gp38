@@ -1,75 +1,105 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { AuthService } from '../services/auth';
+import { auth } from '../firebaseConfig';
+import { onAuthStateChanged } from 'firebase/auth';
 import type { User } from '../types';
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const login = useCallback(async (username: string, password: string) => {
-    try {
-      const user = AuthService.login(username, password);
-      if (!user) {
-        setError('Invalid username or password');
-        return false;
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      try {
+        if (firebaseUser) {
+          // Get additional user data from Firestore
+          const userData = await AuthService.getUserData(firebaseUser.uid);
+          setUser({
+            id: firebaseUser.uid,
+            email: firebaseUser.email!,
+            name: userData.displayName,
+            isAdmin: userData.isAdmin || false,
+            votedOptions: new Set(userData.votedOptions || []),
+            lastLoginAt: userData.lastLoginAt
+          });
+        } else {
+          setUser(null);
+        }
+      } catch (err) {
+        console.error('Auth state change error:', err);
+        setError('Authentication error');
+      } finally {
+        setLoading(false);
       }
-      setUser(user);
+    });
+
+    // Cleanup subscription
+    return () => unsubscribe();
+  }, []);
+
+  const login = useCallback(async (email: string, password: string) => {
+    try {
       setError(null);
-      return true;
+      const userData = await AuthService.login(email, password);
+      setUser(userData);
     } catch (err) {
-      setError('An error occurred during login');
-      return false;
+      setError('Invalid email or password');
+      console.error('Login error:', err);
     }
   }, []);
 
-  const register = useCallback(async (username: string, name: string, password: string) => {
+  const register = useCallback(async (email: string, displayName: string, password: string) => {
     try {
-      const user = AuthService.register(username, name, password);
-      if (!user) {
-        setError('Username already exists');
-        return false;
-      }
-      setUser(user);
       setError(null);
-      return true;
+      const userData = await AuthService.register(email, displayName, password);
+      setUser(userData);
     } catch (err) {
-      setError('An error occurred during registration');
-      return false;
+      setError('Registration failed. Please try again.');
+      console.error('Registration error:', err);
     }
   }, []);
 
-  const resetPassword = useCallback(async (username: string, email: string) => {
+  const resetPassword = useCallback(async (email: string) => {
     try {
-      const success = await AuthService.resetPassword(username, email);
-      if (!success) {
-        setError('User not found');
-        return false;
-      }
       setError(null);
-      return true;
+      await AuthService.resetPassword(email);
     } catch (err) {
-      setError('An error occurred while resetting password');
-      return false;
+      setError('Password reset failed. Please try again.');
+      console.error('Password reset error:', err);
     }
   }, []);
 
-  const logout = useCallback(() => {
-    setUser(null);
-    setError(null);
-  }, []);
+  const logout = useCallback(async () => {
+    try {
+      if (user) {
+        // Ensure votedOptions is saved before logout
+        await AuthService.updateUserProfile(user.id, { votedOptions: user.votedOptions });
+      }
+      await AuthService.logout();
+      setUser(null);
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
+  }, [user]);
 
-  const updateUser = useCallback((updatedUser: User) => {
-    AuthService.updateUser(updatedUser);
-    setUser(updatedUser);
+  const updateUser = useCallback(async (userData: User) => {
+    try {
+      await AuthService.updateUserProfile(userData.id, userData);
+      setUser(userData);
+    } catch (err) {
+      console.error('Update user error:', err);
+    }
   }, []);
 
   return {
     user,
     error,
+    loading,
     login,
     register,
     resetPassword,
     logout,
-    updateUser,
+    updateUser
   };
 }

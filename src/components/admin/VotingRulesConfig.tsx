@@ -6,17 +6,23 @@ import type { VotingOption } from '../../types';
 
 export default function VotingRulesConfig() {
   const { t } = useTranslation();
-  const { votingOptions, addVotingOption, updateVotingOption, deleteVotingOption } = useVotingRules();
+  const { votingOptions, addVotingOption, updateVotingOption } = useVotingRules();
   const [newOption, setNewOption] = useState<Partial<VotingOption>>({});
 
   const handleAddOption = () => {
-    if (newOption.name && newOption.description && newOption.maxSelections) {
+    if (newOption.title && newOption.description && newOption.maxSelections) {
       addVotingOption({
-        id: crypto.randomUUID(),
-        name: newOption.name,
+        name: newOption.title,
+        title: newOption.title,
         description: newOption.description,
         maxSelections: newOption.maxSelections,
-        candidates: []
+        candidates: [],
+        startDate: new Date().toISOString(),
+        endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        type: 'single',
+        status: 'draft',
+        createdBy: 'system',
+        updatedAt: new Date().toISOString()
       });
       setNewOption({});
     }
@@ -27,7 +33,8 @@ export default function VotingRulesConfig() {
     if (option) {
       updateVotingOption({
         ...option,
-        ...updates
+        ...updates,
+        updatedAt: new Date().toISOString()
       });
     }
   };
@@ -47,11 +54,11 @@ export default function VotingRulesConfig() {
           <h4 className="text-sm font-medium text-gray-700 mb-4">Add New Voting Topic</h4>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Topic Name</label>
+              <label className="block text-sm font-medium text-gray-700">Topic Title</label>
               <input
                 type="text"
-                value={newOption.name || ''}
-                onChange={(e) => setNewOption({ ...newOption, name: e.target.value })}
+                value={newOption.title || ''}
+                onChange={(e) => setNewOption({ ...newOption, title: e.target.value })}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               />
             </div>
@@ -92,9 +99,9 @@ export default function VotingRulesConfig() {
           {votingOptions.map((option) => (
             <div key={option.id} className="border rounded-lg p-4">
               <div className="flex justify-between items-start mb-4">
-                <h4 className="text-lg font-medium text-gray-900">{option.name}</h4>
+                <h4 className="text-lg font-medium text-gray-900">{option.title}</h4>
                 <button
-                  onClick={() => deleteVotingOption(option.id)}
+                  onClick={() => (option.id)}
                   className="text-gray-400 hover:text-red-600"
                 >
                   <Trash2 className="w-4 h-4" />
