@@ -11,6 +11,13 @@ vi.mock('../contexts/VotingRulesContext', () => ({
   }),
 }));
 
+// Mock the translation function
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => key, // Return the key itself for testing
+  }),
+}));
+
 describe('AdminDashboard Component', () => {
   const mockOnRestartVoting = vi.fn();
 
@@ -35,7 +42,7 @@ describe('AdminDashboard Component', () => {
     );
 
     // Click add topic button
-    fireEvent.click(screen.getByText('Add Voting Topic'));
+    fireEvent.click(screen.getByText('admin.AddVotingTopic'));
 
     // Fill form
     fireEvent.change(screen.getByLabelText('Topic Name'), {
@@ -63,7 +70,9 @@ describe('AdminDashboard Component', () => {
       />
     );
 
-    fireEvent.click(screen.getByText('Restart Voting'));
+    // Use role matcher for button
+    fireEvent.click(screen.getByRole('button', { name: /admin.restartVoting/i }));
+
     expect(mockOnRestartVoting).toHaveBeenCalled();
   });
 
