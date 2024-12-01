@@ -28,7 +28,7 @@ export function useAuth() {
         }
       } catch (err) {
         console.error('Auth state change error:', err);
-        setError('Authentication error');
+        // setError('Authentication error');
       } finally {
         setLoading(false);
       }

@@ -34,6 +34,32 @@ A modern, secure, and flexible online voting system built with React and TypeScr
 - i18next for internationalization
 - Lucide React for icons
 - Vite for development and building
+- Firebase for authentication and data storage
+
+## Project Structure
+
+```
+src/
+├── components/        # Reusable UI components
+│   ├── admin/        # Admin-specific components
+│   ├── auth/         # Authentication components
+│   └── voting/       # Voting-related components
+├── contexts/         # React context providers
+├── hooks/            # Custom React hooks
+├── services/         # API and business logic
+├── types/           # TypeScript type definitions
+├── utils/           # Helper functions and utilities
+├── i18n/            # Internationalization resources
+└── test/            # Test files and utilities
+```
+
+## Code Organization
+
+- **Component Structure**: Each component is in its own file with associated types and tests
+- **Business Logic**: Separated into services for better maintainability
+- **State Management**: Uses React Context for global state
+- **Type Safety**: Comprehensive TypeScript types for all features
+- **Testing**: Unit tests for components and services
 
 ## Getting Started
 
@@ -46,6 +72,31 @@ A modern, secure, and flexible online voting system built with React and TypeScr
    ```bash
    npm run dev
    ```
+
+## Development Guidelines
+
+### Code Style
+
+- Use TypeScript for type safety
+- Follow ESLint and Prettier configurations
+- Write meaningful component and function names
+- Include JSDoc comments for complex functions
+
+### Component Guidelines
+
+- Keep components focused and single-responsibility
+- Extract reusable logic into custom hooks
+- Use composition over inheritance
+- Implement proper error boundaries
+
+### Testing
+
+- Write unit tests for components and services
+- Use integration tests for complex features
+- Run tests with:
+  ```bash
+  npm run test
+  ```
 
 ## Usage
 
@@ -78,9 +129,16 @@ A modern, secure, and flexible online voting system built with React and TypeScr
 
 1. Fork the repository
 2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request
+3. Follow the coding guidelines
+4. Write tests for new features
+5. Submit a Pull Request
+
+### Pull Request Guidelines
+
+- Keep changes focused and atomic
+- Include relevant tests
+- Update documentation
+- Follow the commit message convention
 
 ## License
 
