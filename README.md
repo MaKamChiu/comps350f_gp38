@@ -2,6 +2,27 @@
 
 A modern, secure, and flexible online voting system built with React and TypeScript.
 
+## Getting Started
+
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+4.Accounts for Testing:
+- **Admin account (pre-configured and cannot be created)**:
+  - Email: admin@admin.com
+  - Password: 123456
+- **Example user account** (for testing):
+  - Email: test@test.com
+  - Password: 123456
+
+
 ## Features
 
 - **Multiple Voting Topics**
@@ -60,18 +81,6 @@ src/
 - **State Management**: Uses React Context for global state
 - **Type Safety**: Comprehensive TypeScript types for all features
 - **Testing**: Unit tests for components and services
-
-## Getting Started
-
-1. Clone the repository
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Start the development server:
-   ```bash
-   npm run dev
-   ```
 
 ## Development Guidelines
 
