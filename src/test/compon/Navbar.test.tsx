@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { screen, fireEvent } from '@testing-library/react';
 import Navbar from '../../components/Navbar';
+import { renderWithProviders } from '../utils/renderWithProviders';
 
 describe('Navbar Component', () => {
   const mockUser = {
@@ -19,7 +20,7 @@ describe('Navbar Component', () => {
   const mockOnLogout = vi.fn();
 
   it('renders correctly for logged-in user', () => {
-    render(
+    renderWithProviders(
       <Navbar user={mockUser} onLogout={mockOnLogout}>
         <div>Test Child</div>
       </Navbar>
@@ -31,7 +32,7 @@ describe('Navbar Component', () => {
   });
 
   it('renders admin indicator for admin users', () => {
-    render(
+    renderWithProviders(
       <Navbar user={mockAdminUser} onLogout={mockOnLogout}>
         <div>Test Child</div>
       </Navbar>
@@ -41,7 +42,7 @@ describe('Navbar Component', () => {
   });
 
   it('calls logout function when logout button is clicked', () => {
-    render(
+    renderWithProviders(
       <Navbar user={mockUser} onLogout={mockOnLogout}>
         <div>Test Child</div>
       </Navbar>
@@ -52,7 +53,7 @@ describe('Navbar Component', () => {
   });
 
   it('renders correctly when no user is logged in', () => {
-    render(
+    renderWithProviders(
       <Navbar user={null} onLogout={mockOnLogout}>
         <div>Test Child</div>
       </Navbar>

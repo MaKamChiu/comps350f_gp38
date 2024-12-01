@@ -16,6 +16,14 @@ export const mockCandidates: Candidate[] = [
     position: 'Vice President',
     votes: 8,
     imageUrl: 'https://example.com/jane.jpg'
+  },
+  {
+    id: '3',
+    name: 'Ken Smith',
+    description: 'Thinker',
+    position: 'Testing',
+    votes: 0,
+    imageUrl: 'https://example.com/jane.jpg'
   }
 ];
 
